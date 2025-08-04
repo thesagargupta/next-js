@@ -205,5 +205,3 @@ const OrderDetailsPage = ({ params }: { params: { id: string } }) => {
 };
 
 export default OrderDetailsPage;
-
-export default OrderDetailsPage;
