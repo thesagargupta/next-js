@@ -2,7 +2,9 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
+
+import React from 'react';
 
 // Interface definitions remain the same
 interface Order {
@@ -21,7 +23,10 @@ interface TrackingInfo {
   history: { timestamp: string; location: string; description: string }[];
 }
 
-const OrderDetailsPage = ({ params }: { params: { id: string } }) => {
+
+const OrderDetailsPage = () => {
+  const params = useParams();
+  const id = params.id as string;
   const { data: session, status } = useSession();
   const router = useRouter();
   const [order, setOrder] = useState<Order | null>(null);
@@ -33,7 +38,7 @@ const OrderDetailsPage = ({ params }: { params: { id: string } }) => {
   // It will only be recreated if params.id changes.
   const fetchOrder = useCallback(async () => {
     try {
-      const res = await fetch(`/api/orders/${params.id}`);
+      const res = await fetch(`/api/orders/${id}`);
       if (!res.ok) {
         throw new Error('Failed to fetch order');
       }
@@ -42,7 +47,7 @@ const OrderDetailsPage = ({ params }: { params: { id: string } }) => {
     } catch (err: any) {
       setError(err.message);
     }
-  }, [params.id]);
+  }, [id]);
 
   // Memoize fetchTracking as well for the same reason.
   const fetchTracking = useCallback(async () => {
