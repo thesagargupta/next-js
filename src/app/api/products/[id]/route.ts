@@ -39,8 +39,9 @@ let products = [
   },
 ];
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const product = products.find(p => p.id === parseInt(params.id));
+export async function GET(request: Request, context: { params: { id: string } }) {
+  const { id } = context.params;
+  const product = products.find(p => p.id === parseInt(id));
   if (product) {
     return NextResponse.json(product);
   } else {
@@ -48,9 +49,10 @@ export async function GET(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, context: { params: { id: string } }) {
+  const { id } = context.params;
   const initialLength = products.length;
-  products = products.filter(p => p.id !== parseInt(params.id));
+  products = products.filter(p => p.id !== parseInt(id));
 
   if (products.length < initialLength) {
     return new Response(null, { status: 204 }); // No Content
@@ -59,9 +61,10 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   }
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, context: { params: { id: string } }) {
+  const { id } = context.params;
   const { name, description, price, image, category, subcategory } = await request.json();
-  const productIndex = products.findIndex(p => p.id === parseInt(params.id));
+  const productIndex = products.findIndex(p => p.id === parseInt(id));
 
   if (productIndex !== -1) {
     products[productIndex] = { ...products[productIndex], name, description, price, image, category, subcategory };
