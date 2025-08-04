@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
+// Interface definitions remain the same
 interface Order {
   id: number;
   customerName: string;
@@ -28,16 +29,9 @@ const OrderDetailsPage = ({ params }: { params: { id: string } }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
-    } else if (status === 'authenticated') {
-      fetchOrder();
-      fetchTracking();
-    }
-  }, [status, router, params.id]);
-
-  const fetchOrder = async () => {
+  // Memoize fetchOrder with useCallback so it's not recreated on every render.
+  // It will only be recreated if params.id changes.
+  const fetchOrder = useCallback(async () => {
     try {
       const res = await fetch(`/api/orders/${params.id}`);
       if (!res.ok) {
@@ -47,23 +41,48 @@ const OrderDetailsPage = ({ params }: { params: { id: string } }) => {
       setOrder(data);
     } catch (err: any) {
       setError(err.message);
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [params.id]);
 
-  const fetchTracking = async () => {
+  // Memoize fetchTracking as well for the same reason.
+  const fetchTracking = useCallback(async () => {
     try {
       const res = await fetch(`/api/track?orderId=${params.id}`);
       if (!res.ok) {
-        throw new Error('Failed to fetch tracking info');
+        // It's okay for tracking to not be found, so we don't throw an error.
+        // We just won't set the tracking state.
+        console.warn('Failed to fetch tracking info');
+        setTracking(null);
+        return;
       }
       const data = await res.json();
       setTracking(data);
     } catch (err: any) {
       setError(err.message);
     }
-  };
+  }, [params.id]);
+
+  // This effect now correctly depends on the memoized functions.
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login');
+    } else if (status === 'authenticated') {
+      const loadInitialData = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          // Run both fetches in parallel for efficiency
+          await Promise.all([fetchOrder(), fetchTracking()]);
+        } catch (err: any) {
+          setError(err.message);
+        } finally {
+          // Set loading to false only after all initial data has been fetched.
+          setLoading(false);
+        }
+      };
+      loadInitialData();
+    }
+  }, [status, router, fetchOrder, fetchTracking]);
 
   const handleRefund = async () => {
     if (!order) return;
@@ -72,9 +91,7 @@ const OrderDetailsPage = ({ params }: { params: { id: string } }) => {
       try {
         const res = await fetch('/api/refund', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ orderId: order.id, amount: parseFloat(order.total.replace(/[^0-9.-]+/g, "")) }),
         });
         const data = await res.json();
@@ -82,7 +99,7 @@ const OrderDetailsPage = ({ params }: { params: { id: string } }) => {
           throw new Error(data.message || 'Refund failed');
         }
         alert(data.message);
-        fetchOrder();
+        fetchOrder(); // Refresh order details
       } catch (err: any) {
         alert(`Refund Error: ${err.message}`);
       }
@@ -94,9 +111,7 @@ const OrderDetailsPage = ({ params }: { params: { id: string } }) => {
     try {
       const res = await fetch('/api/invoice', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           orderId: order.id,
           customerName: order.customerName,
@@ -121,9 +136,7 @@ const OrderDetailsPage = ({ params }: { params: { id: string } }) => {
       try {
         const res = await fetch('/api/shiprocket', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ orderId: order.id, status: newStatus }),
         });
         const data = await res.json();
@@ -138,6 +151,7 @@ const OrderDetailsPage = ({ params }: { params: { id: string } }) => {
     }
   };
 
+  // Render logic remains the same
   if (status === 'loading' || loading) {
     return <div className="container mx-auto px-4 py-16 text-center">Loading...</div>;
   }
