@@ -34,8 +34,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const order = orders.find(o => o.id === parseInt(params.id));
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const id = url.pathname.split('/').pop();
+  const order = orders.find(o => o.id === Number(id));
   if (order) {
     return NextResponse.json(order);
   } else {
