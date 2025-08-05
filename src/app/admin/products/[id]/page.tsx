@@ -13,12 +13,24 @@ interface Product {
   subcategory: string;
 }
 
+import type { FC } from 'react';
+
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: string;
+  image: string;
+  category: string;
+  subcategory: string;
+}
+
 interface PageProps {
   params: { id: string };
   searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-const EditProductPage = ({ params }: PageProps) => {
+const EditProductPage: FC<PageProps> = ({ params }) => {
   const router = useRouter();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
