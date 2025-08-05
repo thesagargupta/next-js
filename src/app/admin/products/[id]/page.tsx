@@ -19,7 +19,7 @@ interface EditProductPageProps {
   searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-const EditProductPage: FC<EditProductPageProps> = ({ params }) => {
+const EditProductPage = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
