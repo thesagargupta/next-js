@@ -1,10 +1,15 @@
+
 'use client';
 
-const EditProductPage = ({ params }: { params: { id: string } }) => {
+import { useParams } from 'next/navigation';
+
+const EditProductPage = () => {
+  const params = useParams();
+  const id = params.id as string;
   return (
     <div>
       <h1>Edit Product Page</h1>
-      <p>Product ID: {params.id}</p>
+      <p>Product ID: {id}</p>
     </div>
   );
 };
