@@ -22,9 +22,9 @@ let orders = [
   },
 ];
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, context: { params: { id: string } }) {
   const { status } = await request.json();
-  const orderIndex = orders.findIndex(o => o.id === parseInt(params.id));
+  const orderIndex = orders.findIndex(o => o.id === parseInt(context.params.id));
 
   if (orderIndex !== -1) {
     orders[orderIndex] = { ...orders[orderIndex], status };
