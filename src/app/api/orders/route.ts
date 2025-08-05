@@ -25,15 +25,3 @@ let orders = [
 export async function GET() {
   return NextResponse.json(orders);
 }
-
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
-  const { status } = await request.json();
-  const orderIndex = orders.findIndex(o => o.id === parseInt(params.id));
-
-  if (orderIndex !== -1) {
-    orders[orderIndex] = { ...orders[orderIndex], status };
-    return NextResponse.json(orders[orderIndex]);
-  } else {
-    return new Response('Order not found', { status: 404 });
-  }
-}
