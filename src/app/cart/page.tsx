@@ -2,9 +2,11 @@
 
 import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const CartPage = () => {
   const { cart, removeFromCart, updateQuantity, getTotal } = useCart();
+  const router = useRouter();
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -59,7 +61,7 @@ const CartPage = () => {
               <span>Total</span>
               <span>₹{(parseFloat(getTotal().replace(/[^0-9.-]+/g, "")) + 100).toFixed(2)}</span>
             </div>
-            <button className="bg-gray-800 text-white font-bold py-3 px-6 rounded-full w-full mt-8 hover:bg-gray-700">Checkout</button>
+            <button onClick={() => router.push('/checkout')} className="bg-gray-800 text-white font-bold py-3 px-6 rounded-full w-full mt-8 hover:bg-gray-700">Checkout</button>
           </div>
         </div>
       </div>
