@@ -22,9 +22,9 @@ let orders = [
   },
 ];
 
-export async function PUT(request: Request, context: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: { id: string } }) {
   const { status } = await request.json();
-  const orderIndex = orders.findIndex(o => o.id === parseInt(context.params.id));
+  const orderIndex = orders.findIndex(o => o.id === parseInt(params.id));
 
   if (orderIndex !== -1) {
     orders[orderIndex] = { ...orders[orderIndex], status };
@@ -34,8 +34,8 @@ export async function PUT(request: Request, context: { params: { id: string } })
   }
 }
 
-export async function GET(request: Request, context: { params: { id: string } }) {
-  const order = orders.find(o => o.id === parseInt(context.params.id));
+export async function GET(request: Request, { params }: { params: { id: string } }) {
+  const order = orders.find(o => o.id === parseInt(params.id));
   if (order) {
     return NextResponse.json(order);
   } else {
