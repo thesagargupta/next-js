@@ -2,17 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: string;
-  image: string;
-  category: string;
-  subcategory: string;
-}
-
 import type { FC } from 'react';
 
 interface Product {
@@ -25,12 +14,12 @@ interface Product {
   subcategory: string;
 }
 
-interface PageProps {
+interface EditProductPageProps {
   params: { id: string };
   searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-const EditProductPage: FC<PageProps> = ({ params }) => {
+const EditProductPage: FC<EditProductPageProps> = ({ params }) => {
   const router = useRouter();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
