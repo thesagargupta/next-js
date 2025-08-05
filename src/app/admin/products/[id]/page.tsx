@@ -13,7 +13,11 @@ interface Product {
   subcategory: string;
 }
 
-const EditProductPage = ({ params }: { params: { id: string } }) => {
+interface EditProductPageProps {
+  params: { id: string };
+}
+
+const EditProductPage = ({ params }: EditProductPageProps) => {
   const router = useRouter();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
